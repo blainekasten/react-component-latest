@@ -1,3 +1,6 @@
+# react-component-latest
+HOC to allow components to self-update themselves on the client
+
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
 Below you will find some information on how to perform common tasks.<br>
