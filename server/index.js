@@ -5,7 +5,7 @@ app.get('/validate', function(req, res) {
   setTimeout(() => {
     res.send({
       valid: false,
-      updateEndpoint: '/Button210.js',
+      updateEndpoint: '/Uniform210.js',
     });
   }, 2000);
 });
