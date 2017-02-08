@@ -27,7 +27,7 @@ export default class HOC extends React.Component {
 
         const script = document.createElement('script');
         script.src = res.updateEndpoint;
-        script.type = 'text\/javascript';
+        script.type = 'text/javascript';
 
         script.onerror = e => console.log(e);
         script.onload = () => {
