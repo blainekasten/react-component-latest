@@ -15,6 +15,7 @@ class App extends Component {
           <h2>Welcome to React</h2>
         </div>
         <div className="App-intro">
+          <h4>This component will update itself soon</h4>
 
           <Button />
         </div>

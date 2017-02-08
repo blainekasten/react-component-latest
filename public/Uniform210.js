@@ -4266,7 +4266,7 @@ var HOC = function (_React$Component) {
           return console.log(e);
         };
         script.onload = function () {
-          _this2.setState({ localUpdate: window.__uniform[_this2.props.componentName] });
+          _this2.setState({ localUpdate: window.__uniform.default[_this2.props.componentName] });
         };
 
         curScript.parentNode.insertBefore(script, curScript);
