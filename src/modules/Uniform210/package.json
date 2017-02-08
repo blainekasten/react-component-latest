@@ -5,6 +5,7 @@
   "repository": {},
   "license": "MIT",
   "scripts": {
+    "prebuild": "npm install",
     "build": "webpack"
   },
   "dependencies": {
