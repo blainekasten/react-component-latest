@@ -34,8 +34,6 @@ const HOC = WrappedComponent => class extends Component {
           this.loadJSEndpoint(res.updateEndpointJS),
           this.loadCSSEndpoint(res.updateEndpointCSS),
         ]).then(() => {
-          console.log(window.__uniform.default);
-
           this.setState({localUpdate: window.__uniform.default[WrappedComponent.displayName]});
         }).catch(e => {
           console.log('ERROR', e);
