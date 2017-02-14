@@ -3,7 +3,9 @@ import Wrap from './Wrap';
 
 function Button() {
   return (
-    <div><button>Button</button></div>
+    <div>
+      <button className='button204'>Button</button>
+    </div>
   );
 }
 

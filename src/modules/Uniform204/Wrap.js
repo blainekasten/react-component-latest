@@ -1,6 +1,12 @@
 import React from 'react';
+import { version } from './package.json';
 
 export default class HOC extends React.Component {
+  static propTypes = {
+    children: React.PropTypes.node,
+    componentName: React.PropTypes.string,
+  }
+
   constructor(props) {
     super(props);
     this.state = {
@@ -14,10 +20,9 @@ export default class HOC extends React.Component {
       return;
     }
 
-    const curScript = document.currentScript;
     window.uniformFetchState = 'fetching';
 
-    fetch('/validate')
+    fetch(`/validate?version=${version}`)
       .then(res => res.json())
       .then(res => {
         window.uniformFetchState = 'fetched';
@@ -25,17 +30,46 @@ export default class HOC extends React.Component {
           return;
         }
 
-        const script = document.createElement('script');
-        script.src = res.updateEndpoint;
-        script.type = 'text/javascript';
-
-        script.onerror = e => console.log(e);
-        script.onload = () => {
+        Promise.all([
+          this.loadJSEndpoint(res.updateEndpointJS),
+          this.loadCSSEndpoint(res.updateEndpointCSS),
+        ]).then(() => {
           this.setState({localUpdate: window.__uniform.default[this.props.componentName]});
-        };
-
-        curScript.parentNode.insertBefore(script, curScript);
+        }).catch(e => {
+          console.log('ERROR', e);
+        });
       });
+  }
+
+  loadJSEndpoint(endpoint) {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = endpoint;
+      script.type = 'text/javascript';
+
+      script.onerror = e => reject(e);
+      script.onload = () => {
+        resolve();
+      };
+
+      document.head.appendChild(script);
+    });
+  }
+
+  loadCSSEndpoint(endpoint) {
+    return new Promise((resolve, reject) => {
+      const link = document.createElement('link');
+      link.href = endpoint;
+      link.type = 'text/css';
+      link.rel = 'stylesheet';
+
+      link.onerror = e => reject(e);
+      link.onload = () => {
+        resolve();
+      };
+
+      document.head.appendChild(link);
+    });
   }
 
   render() {
@@ -46,9 +80,4 @@ export default class HOC extends React.Component {
 
     return this.props.children;
   }
-}
-
-HOC.propTypes = {
-  children: React.PropTypes.node,
-  componentName: React.PropTypes.string,
 }
