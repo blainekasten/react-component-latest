@@ -73,7 +73,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 33);
+/******/ 	return __webpack_require__(__webpack_require__.s = 34);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -1987,7 +1987,7 @@ function Button() {
     ),
     _react2.default.createElement(
       'button',
-      null,
+      { className: 'button210' },
       'Button'
     )
   );
@@ -4215,6 +4215,8 @@ var _react = __webpack_require__(18);
 
 var _react2 = _interopRequireDefault(_react);
 
+var _package = __webpack_require__(33);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -4247,10 +4249,9 @@ var HOC = function (_React$Component) {
         return;
       }
 
-      var curScript = document.currentScript;
       window.uniformFetchState = 'fetching';
 
-      fetch('/validate').then(function (res) {
+      fetch('/validate?version=' + _package.version).then(function (res) {
         return res.json();
       }).then(function (res) {
         window.uniformFetchState = 'fetched';
@@ -4258,18 +4259,48 @@ var HOC = function (_React$Component) {
           return;
         }
 
+        Promise.all([_this2.loadJSEndpoint(res.updateEndpointJS), _this2.loadCSSEndpoint(res.updateEndpointCSS)]).then(function () {
+          _this2.setState({ localUpdate: window.__uniform.default[_this2.props.componentName] });
+        }).catch(function (e) {
+          console.log('ERROR', e);
+        });
+      });
+    }
+  }, {
+    key: 'loadJSEndpoint',
+    value: function loadJSEndpoint(endpoint) {
+      return new Promise(function (resolve, reject) {
         var script = document.createElement('script');
-        script.src = res.updateEndpoint;
-        script.type = 'text\/javascript';
+        script.src = endpoint;
+        script.type = 'text/javascript';
 
         script.onerror = function (e) {
-          return console.log(e);
+          return reject(e);
         };
         script.onload = function () {
-          _this2.setState({ localUpdate: window.__uniform.default[_this2.props.componentName] });
+          resolve();
         };
 
-        curScript.parentNode.insertBefore(script, curScript);
+        document.head.appendChild(script);
+      });
+    }
+  }, {
+    key: 'loadCSSEndpoint',
+    value: function loadCSSEndpoint(endpoint) {
+      return new Promise(function (resolve, reject) {
+        var link = document.createElement('link');
+        link.href = endpoint;
+        link.type = 'text/css';
+        link.rel = 'stylesheet';
+
+        link.onerror = function (e) {
+          return reject(e);
+        };
+        link.onload = function () {
+          resolve();
+        };
+
+        document.head.appendChild(link);
       });
     }
   }, {
@@ -4287,15 +4318,39 @@ var HOC = function (_React$Component) {
   return HOC;
 }(_react2.default.Component);
 
-exports.default = HOC;
-
-
 HOC.propTypes = {
-  children: _react2.default.PropTypes.node
+  children: _react2.default.PropTypes.node,
+  componentName: _react2.default.PropTypes.string
 };
+exports.default = HOC;
 
 /***/ }),
 /* 33 */
+/***/ (function(module, exports) {
+
+module.exports = {
+	"name": "Uniform210",
+	"version": "1.0.0",
+	"main": "index.js",
+	"repository": {},
+	"license": "MIT",
+	"scripts": {
+		"prebuild": "npm install",
+		"build": "webpack"
+	},
+	"dependencies": {
+		"babel-loader": "^6.2.10",
+		"babel-preset-es2015": "^6.22.0",
+		"babel-preset-react": "^6.22.0",
+		"webpack": "^2.2.1"
+	},
+	"devDependencies": {
+		"babel-preset-stage-0": "^6.22.0"
+	}
+};
+
+/***/ }),
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

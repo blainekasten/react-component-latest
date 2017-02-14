@@ -1,10 +1,12 @@
-
 import React from 'react';
 import Wrap from './Wrap';
 
 function Button() {
   return (
-    <div><label>Tada!</label><button>Button</button></div>
+    <div>
+      <label>Tada!</label>
+      <button className='button210'>Button</button>
+    </div>
   );
 }
 

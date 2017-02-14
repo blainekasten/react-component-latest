@@ -1,6 +1,14 @@
 import React, { Component } from 'react';
+import { version } from './package.json';
+
 
 const HOC = WrappedComponent => class extends Component {
+  static propTypes = {
+    children: React.PropTypes.node,
+    componentName: React.PropTypes.string,
+  }
+
+
   constructor(props) {
     super(props);
 
@@ -9,37 +17,70 @@ const HOC = WrappedComponent => class extends Component {
     };
   }
 
+
   componentDidMount() {
     // things have already fetched once
     if (window.uniformFetchState) return;
 
-    const curScript = document.currentScript;
     window.uniformFetchState = 'fetching';
 
-    fetch('/validate')
+    fetch(`/validate?version=${version}`)
       .then(res => res.json())
       .then(res => {
         window.uniformFetchState = 'fetched';
         if (res.valid) return;
 
-        const script = document.createElement('script');
-        script.src = res.updateEndpoint;
-        script.type = 'text/javascript';
+        Promise.all([
+          this.loadJSEndpoint(res.updateEndpointJS),
+          this.loadCSSEndpoint(res.updateEndpointCSS),
+        ]).then(() => {
+          console.log(window.__uniform.default);
 
-        script.onerror = e => console.log(e);
-        script.onload = () => {
-          console.log(window.__uniform);
           this.setState({localUpdate: window.__uniform.default[WrappedComponent.displayName]});
-        };
-
-        curScript.parentNode.insertBefore(script, curScript);
+        }).catch(e => {
+          console.log('ERROR', e);
+        });
       });
   }
+
+
+  loadJSEndpoint(endpoint) {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = endpoint;
+      script.type = 'text/javascript';
+
+      script.onerror = e => reject(e);
+      script.onload = () => {
+        resolve();
+      };
+
+      document.head.appendChild(script);
+    });
+  }
+
+
+  loadCSSEndpoint(endpoint) {
+    return new Promise((resolve, reject) => {
+      const link = document.createElement('link');
+      link.href = endpoint;
+      link.type = 'text/css';
+      link.rel = 'stylesheet';
+
+      link.onerror = e => reject(e);
+      link.onload = () => {
+        resolve();
+      };
+
+      document.head.appendChild(link);
+    });
+  }
+
 
   render() {
     const ComponentToUse = this.state.localUpdate || WrappedComponent;
 
-    return <ComponentToUse />
+    return <ComponentToUse {...this.props} />
   }
 }
 
