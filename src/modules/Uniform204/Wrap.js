@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { Component } from 'react';
 
-export default class HOC extends React.Component {
+const HOC = WrappedComponent => class extends Component {
   constructor(props) {
     super(props);
+
     this.state = {
       localUpdate: null,
     };
@@ -10,9 +11,7 @@ export default class HOC extends React.Component {
 
   componentDidMount() {
     // things have already fetched once
-    if (window.uniformFetchState) {
-      return;
-    }
+    if (window.uniformFetchState) return;
 
     const curScript = document.currentScript;
     window.uniformFetchState = 'fetching';
@@ -21,9 +20,7 @@ export default class HOC extends React.Component {
       .then(res => res.json())
       .then(res => {
         window.uniformFetchState = 'fetched';
-        if (res.valid) {
-          return;
-        }
+        if (res.valid) return;
 
         const script = document.createElement('script');
         script.src = res.updateEndpoint;
@@ -31,7 +28,8 @@ export default class HOC extends React.Component {
 
         script.onerror = e => console.log(e);
         script.onload = () => {
-          this.setState({localUpdate: window.__uniform.default[this.props.componentName]});
+          console.log(window.__uniform);
+          this.setState({localUpdate: window.__uniform.default[WrappedComponent.displayName]});
         };
 
         curScript.parentNode.insertBefore(script, curScript);
@@ -39,16 +37,11 @@ export default class HOC extends React.Component {
   }
 
   render() {
-    if (this.state.localUpdate) {
-      const UpdatedComponent = this.state.localUpdate;
-      return <UpdatedComponent {...this.props} />;
-    }
+    const ComponentToUse = this.state.localUpdate || WrappedComponent;
 
-    return this.props.children;
+    return <ComponentToUse />
   }
 }
 
-HOC.propTypes = {
-  children: React.PropTypes.node,
-  componentName: React.PropTypes.string,
-}
+
+export default HOC;

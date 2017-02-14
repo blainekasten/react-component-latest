@@ -8,5 +8,6 @@ function Button() {
 }
 
 Button.VERSION = '2.0.4';
+Button.displayName = 'Button';
 
-export default () => <Wrap componentName="Button"><Button /></Wrap>;
+export default Wrap(Button);
