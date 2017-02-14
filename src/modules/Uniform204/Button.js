@@ -1,7 +1,7 @@
 import React from 'react';
 import Wrap from './Wrap';
 
-function Button() {
+export function Button() {
   return (
     <div>
       <button className='button204'>Button</button>

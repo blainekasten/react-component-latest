@@ -1,7 +1,7 @@
 import React from 'react';
 import Wrap from './Wrap';
 
-function Button() {
+export function Button() {
   return (
     <div>
       <label>Tada!</label>
@@ -11,5 +11,6 @@ function Button() {
 }
 
 Button.VERSION = '2.1.0';
+Button.displayName = 'Button';
 
-export default () => <Wrap componentName="Button"><Button /></Wrap>;
+export default Wrap(Button);

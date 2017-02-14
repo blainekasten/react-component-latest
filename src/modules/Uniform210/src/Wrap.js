@@ -1,24 +1,26 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { version } from '../package.json';
 
-export default class HOC extends React.Component {
+
+const HOC = WrappedComponent => class extends Component {
   static propTypes = {
     children: React.PropTypes.node,
     componentName: React.PropTypes.string,
   }
 
+
   constructor(props) {
     super(props);
+
     this.state = {
       localUpdate: null,
     };
   }
 
+
   componentDidMount() {
     // things have already fetched once
-    if (window.uniformFetchState) {
-      return;
-    }
+    if (window.uniformFetchState) return;
 
     window.uniformFetchState = 'fetching';
 
@@ -26,20 +28,19 @@ export default class HOC extends React.Component {
       .then(res => res.json())
       .then(res => {
         window.uniformFetchState = 'fetched';
-        if (res.valid) {
-          return;
-        }
+        if (res.valid) return;
 
         Promise.all([
           this.loadJSEndpoint(res.updateEndpointJS),
           this.loadCSSEndpoint(res.updateEndpointCSS),
         ]).then(() => {
-          this.setState({localUpdate: window.__uniform.default[this.props.componentName]});
+          this.setState({localUpdate: window.__uniform.default[WrappedComponent.displayName]});
         }).catch(e => {
           console.log('ERROR', e);
         });
       });
   }
+
 
   loadJSEndpoint(endpoint) {
     return new Promise((resolve, reject) => {
@@ -55,6 +56,7 @@ export default class HOC extends React.Component {
       document.head.appendChild(script);
     });
   }
+
 
   loadCSSEndpoint(endpoint) {
     return new Promise((resolve, reject) => {
@@ -72,13 +74,13 @@ export default class HOC extends React.Component {
     });
   }
 
-  render() {
-    if (this.state.localUpdate) {
-      const UpdatedComponent = this.state.localUpdate;
-      return <UpdatedComponent {...this.props} />;
-    }
 
-    return this.props.children;
+  render() {
+    const ComponentToUse = this.state.localUpdate || WrappedComponent;
+
+    return <ComponentToUse {...this.props} />
   }
 }
 
+
+export default HOC;

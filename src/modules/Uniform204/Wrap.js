@@ -8,6 +8,8 @@ const HOC = WrappedComponent => class extends Component {
     componentName: React.PropTypes.string,
   }
 
+  static displayName = `Wrapped(${WrappedComponent.displayName})`
+
 
   constructor(props) {
     super(props);
@@ -48,10 +50,8 @@ const HOC = WrappedComponent => class extends Component {
       script.src = endpoint;
       script.type = 'text/javascript';
 
-      script.onerror = e => reject(e);
-      script.onload = () => {
-        resolve();
-      };
+      script.onerror = reject;
+      script.onload = resolve;
 
       document.head.appendChild(script);
     });

@@ -1965,6 +1965,7 @@ module.exports = __webpack_require__(22);
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.Button = Button;
 
 var _react = __webpack_require__(18);
 
@@ -1994,14 +1995,9 @@ function Button() {
 }
 
 Button.VERSION = '2.1.0';
+Button.displayName = 'Button';
 
-exports.default = function () {
-  return _react2.default.createElement(
-    _Wrap2.default,
-    { componentName: 'Button' },
-    _react2.default.createElement(Button, null)
-  );
-};
+exports.default = (0, _Wrap2.default)(Button);
 
 /***/ }),
 /* 20 */
@@ -4225,103 +4221,99 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var HOC = function (_React$Component) {
-  _inherits(HOC, _React$Component);
+var HOC = function HOC(WrappedComponent) {
+  var _class, _temp;
 
-  function HOC(props) {
-    _classCallCheck(this, HOC);
+  return _temp = _class = function (_Component) {
+    _inherits(_class, _Component);
 
-    var _this = _possibleConstructorReturn(this, (HOC.__proto__ || Object.getPrototypeOf(HOC)).call(this, props));
+    function _class(props) {
+      _classCallCheck(this, _class);
 
-    _this.state = {
-      localUpdate: null
-    };
-    return _this;
-  }
+      var _this = _possibleConstructorReturn(this, (_class.__proto__ || Object.getPrototypeOf(_class)).call(this, props));
 
-  _createClass(HOC, [{
-    key: 'componentDidMount',
-    value: function componentDidMount() {
-      var _this2 = this;
+      _this.state = {
+        localUpdate: null
+      };
+      return _this;
+    }
 
-      // things have already fetched once
-      if (window.uniformFetchState) {
-        return;
-      }
+    _createClass(_class, [{
+      key: 'componentDidMount',
+      value: function componentDidMount() {
+        var _this2 = this;
 
-      window.uniformFetchState = 'fetching';
+        // things have already fetched once
+        if (window.uniformFetchState) return;
 
-      fetch('/validate?version=' + _package.version).then(function (res) {
-        return res.json();
-      }).then(function (res) {
-        window.uniformFetchState = 'fetched';
-        if (res.valid) {
-          return;
-        }
+        window.uniformFetchState = 'fetching';
 
-        Promise.all([_this2.loadJSEndpoint(res.updateEndpointJS), _this2.loadCSSEndpoint(res.updateEndpointCSS)]).then(function () {
-          _this2.setState({ localUpdate: window.__uniform.default[_this2.props.componentName] });
-        }).catch(function (e) {
-          console.log('ERROR', e);
+        fetch('/validate?version=' + _package.version).then(function (res) {
+          return res.json();
+        }).then(function (res) {
+          window.uniformFetchState = 'fetched';
+          if (res.valid) return;
+
+          Promise.all([_this2.loadJSEndpoint(res.updateEndpointJS), _this2.loadCSSEndpoint(res.updateEndpointCSS)]).then(function () {
+            _this2.setState({ localUpdate: window.__uniform.default[WrappedComponent.displayName] });
+          }).catch(function (e) {
+            console.log('ERROR', e);
+          });
         });
-      });
-    }
-  }, {
-    key: 'loadJSEndpoint',
-    value: function loadJSEndpoint(endpoint) {
-      return new Promise(function (resolve, reject) {
-        var script = document.createElement('script');
-        script.src = endpoint;
-        script.type = 'text/javascript';
-
-        script.onerror = function (e) {
-          return reject(e);
-        };
-        script.onload = function () {
-          resolve();
-        };
-
-        document.head.appendChild(script);
-      });
-    }
-  }, {
-    key: 'loadCSSEndpoint',
-    value: function loadCSSEndpoint(endpoint) {
-      return new Promise(function (resolve, reject) {
-        var link = document.createElement('link');
-        link.href = endpoint;
-        link.type = 'text/css';
-        link.rel = 'stylesheet';
-
-        link.onerror = function (e) {
-          return reject(e);
-        };
-        link.onload = function () {
-          resolve();
-        };
-
-        document.head.appendChild(link);
-      });
-    }
-  }, {
-    key: 'render',
-    value: function render() {
-      if (this.state.localUpdate) {
-        var UpdatedComponent = this.state.localUpdate;
-        return _react2.default.createElement(UpdatedComponent, this.props);
       }
+    }, {
+      key: 'loadJSEndpoint',
+      value: function loadJSEndpoint(endpoint) {
+        return new Promise(function (resolve, reject) {
+          var script = document.createElement('script');
+          script.src = endpoint;
+          script.type = 'text/javascript';
 
-      return this.props.children;
-    }
-  }]);
+          script.onerror = function (e) {
+            return reject(e);
+          };
+          script.onload = function () {
+            resolve();
+          };
 
-  return HOC;
-}(_react2.default.Component);
+          document.head.appendChild(script);
+        });
+      }
+    }, {
+      key: 'loadCSSEndpoint',
+      value: function loadCSSEndpoint(endpoint) {
+        return new Promise(function (resolve, reject) {
+          var link = document.createElement('link');
+          link.href = endpoint;
+          link.type = 'text/css';
+          link.rel = 'stylesheet';
 
-HOC.propTypes = {
-  children: _react2.default.PropTypes.node,
-  componentName: _react2.default.PropTypes.string
+          link.onerror = function (e) {
+            return reject(e);
+          };
+          link.onload = function () {
+            resolve();
+          };
+
+          document.head.appendChild(link);
+        });
+      }
+    }, {
+      key: 'render',
+      value: function render() {
+        var ComponentToUse = this.state.localUpdate || WrappedComponent;
+
+        return _react2.default.createElement(ComponentToUse, this.props);
+      }
+    }]);
+
+    return _class;
+  }(_react.Component), _class.propTypes = {
+    children: _react2.default.PropTypes.node,
+    componentName: _react2.default.PropTypes.string
+  }, _temp;
 };
+
 exports.default = HOC;
 
 /***/ }),
